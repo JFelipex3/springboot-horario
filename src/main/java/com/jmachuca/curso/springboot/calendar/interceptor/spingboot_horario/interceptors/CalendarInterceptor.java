@@ -1,6 +1,7 @@
 package com.jmachuca.curso.springboot.calendar.interceptor.spingboot_horario.interceptors;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Component
+@Component("calendarInterceptor")
 public class CalendarInterceptor implements HandlerInterceptor{
 
     @Value("${config.calendar.open}")
@@ -28,17 +29,18 @@ public class CalendarInterceptor implements HandlerInterceptor{
 
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        System.out.println(hour);
+        System.out.println("Hora Actual: " +hour);
 
         if (hour >= open && hour <= close) {
             StringBuilder message = new StringBuilder("Bienvenido al horario de atención a clientes");
             message.append(", atendemos desde las ");
             message.append(open);
-            message.append("hrs. hasta las ");
+            message.append(" hrs. hasta las ");
             message.append(close);
-            message.append("hrs. Gracias por su visita");
+            message.append(" hrs. Gracias por su visita");
 
             request.setAttribute("message", message.toString());
+            request.setAttribute("date", new Date().toString());
 
             return true;
         }
@@ -46,14 +48,15 @@ public class CalendarInterceptor implements HandlerInterceptor{
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> data = new HashMap<>();
 
-        StringBuilder message = new StringBuilder("Cerrado, fuera del horario de atención");
+        StringBuilder message = new StringBuilder("Cerrado, fuera del horario de atención ");
         message.append("por favor visitenos desde las ");
         message.append(open);
-        message.append("hrs. y las ");
+        message.append(" hrs. y las ");
         message.append(close);
-        message.append("hrs. Gracias!");
+        message.append(" hrs. Gracias!");
 
         data.put("message", message);
+        data.put("date", new Date().toString());
 
         response.setContentType("application/json");
         response.setStatus(401);
